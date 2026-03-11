@@ -1,35 +1,33 @@
 from langchain_community.vectorstores import FAISS
-from langchain_openai import OpenAIEmbeddings
+from langchain_huggingface import HuggingFaceEmbeddings # No API key needed
+import logging
+
+logger = logging.getLogger(__name__)
 
 class AstroVectorStore:
     def __init__(self):
         self.vector_db = None
-        self.embeddings = OpenAIEmbeddings()
+        # Using a lightweight local model: sentence-transformers/all-MiniLM-L6-v2
+        self.embeddings = HuggingFaceEmbeddings(model_name="all-MiniLM-L6-v2")
 
     def initialize_vector_db(self, documents):
-        """Builds the FAISS index from processed chunks."""
+        """Builds the FAISS index from the documents loaded by ingestor.py."""
+        if not documents:
+            logger.error("No documents provided to initialize Vector DB.")
+            return
         self.vector_db = FAISS.from_documents(documents, self.embeddings)
-        print("Vector database initialized.")
+        logger.info("Local FAISS Vector DB initialized successfully.")
 
     def is_retrieval_required(self, query: str) -> bool:
-        """
-        Explicitly decides when to retrieve[cite: 89].
-        Returns True for factual/astrological queries.
-        Returns False for greetings, summaries, or follow-ups[cite: 94, 95].
-        """
-        retrieval_keywords = ["why", "planet", "career", "love", "future", "affecting", "traits"]
+        """Explicit decision logic to decide when to retrieve[cite: 89, 101, 102]."""
         query_lower = query.lower()
-        
-        # Simple keyword check or a small LLM 'intent' check
-        if any(word in query_lower for word in retrieval_keywords):
-            return True
-        return False
+        # Retrieve if asking about zodiac, planets, or general advice [cite: 91-93]
+        keywords = ["zodiac", "planet", "trait", "career", "stress", "future", "affect"]
+        return any(word in query_lower for word in keywords)
 
     def get_relevant_context(self, query: str):
-        """Fetches facts from vedic_astrology.txt or JSON files [cite: 103-105]."""
+        """Performs semantic search to find top-3 relevant facts[cite: 47, 88]."""
         if not self.vector_db:
             return []
-        
-        # Search for the top 3 most relevant snippets
-        search_results = self.vector_db.similarity_search(query, k=3)
-        return search_results
+        # Return top 3 matches for grounding responses [cite: 102]
+        return self.vector_db.similarity_search(query, k=3)
