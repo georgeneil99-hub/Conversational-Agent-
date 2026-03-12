@@ -19,10 +19,12 @@ class AstroVectorStore:
         logger.info("Local FAISS Vector DB initialized successfully.")
 
     def is_retrieval_required(self, query: str) -> bool:
-        """Explicit decision logic to decide when to retrieve[cite: 89, 101, 102]."""
         query_lower = query.lower()
-        # Retrieve if asking about zodiac, planets, or general advice [cite: 91-93]
-        keywords = ["zodiac", "planet", "trait", "career", "stress", "future", "affect"]
+        # Add common planets to the intent keywords
+        keywords = [
+            "zodiac", "planet", "trait", "career", "stress", "future", "affect",
+            "sun", "moon", "mars", "mercury", "jupiter", "venus", "saturn"
+        ]
         return any(word in query_lower for word in keywords)
 
     def get_relevant_context(self, query: str):
