@@ -137,4 +137,42 @@ python -m uvicorn src.main:app --reload
              "preferred_language": "hi"
            }
          }'
-## 2. Core Architectural Concepts (Interview Showcase)To excel in high-stakes Astrology Tech roles, this system shifts from standard "Model Scientist" thinking to "System Architect" logic.### A. Intent-Aware Retrieval (The "Router" Logic)Instead of a standard "Retrieve-Every-Time" linear flow, this system utilizes Selective Retrieval.Concept: Before querying the Vector DB (FAISS), the system uses an intent classifier to determine if a search is necessary.Optimization: For "Chit-chat" or requests like "Can you summarize our chat?", the system bypasses the vector search to reduce latency and API costs.Interview Insight: This addresses the Cost/Quality Awareness paradigm shift, ensuring FAISS is only queried when it adds factual value.### B. Deep Persona Memory ManagementStandard chatbots are often stateless; this agent owns the conversation state.Sliding Window Memory: Implements a deque with a maxlen=k to ensure controlled memory growth.State Ownership: Moves beyond simple "Last-N" turns by linking session IDs to persistent user profiles (DOB, Time, Location) to infer life goals and personality traits.Hybrid Approach: While the middle of long conversations can be summarized to avoid the "Lost-in-the-Middle" problem, the core system prompt and user profile are "pinned" to maintain the "Guru-shishya" decorum.### C. "Bharat-First" Multilingual NLUTreating Hindi and Indian dialects as core logic layers rather than secondary translations.Tokenization Nuances: Standard tokenizers have high "Fertility Rates" for Hindi (breaking one word into 6+ tokens), which exhausts context windows and inflates costs.Indic-First Logic: Designed to handle Code-Switching (Hinglish) and Vibhakti (case endings) where standard English-centric NLP fails.Grounding in "Truth": To prevent hallucinations in ritual or Sloka interpretations, the system employs Correctness Agents that validate outputs against verified scriptures like the Panchang.## 3. System Design Trade-offsFeatureChoiceJustificationVector DBLocal FAISSChosen over managed services (Pinecone) to eliminate network hop latency for sub-second orchestration.MemorySliding WindowPrevents the model from "forgetting" the user's core intent while managing token limits without the loss of nuance found in constant summarization.RAG vs. Fine-tuningRAGAstrology requires factual grounding in fresh planetary transits. RAG provides non-parametric memory that doesn't suffer from "catastrophic forgetting".## 4. Future Roadmap & ScalabilityHybrid Search: Combining FAISS semantic search with keyword-based BM25 for precise ritual/entity lookup.Infrastructure Orchestration: Moving from a single-model setup to a routing layer that batches prompts across OpenAI, Claude, and LLaMA based on query complexity.Symbolic Hybrid AI: Integrating a symbolic rule-based engine for mathematically certain astronomical events (planetary degrees) while using LLMs for unstructured interpretation.
+## 2. Core Architectural Concepts (Interview Showcase)
+To excel in high-stakes Astrology Tech roles, this system shifts from standard "Model Scientist" thinking to "System Architect" logic.
+
+
+### A. Intent-Aware Retrieval (The "Router" Logic)
+Instead of a standard "Retrieve-Every-Time" linear flow, this system utilizes Selective Retrieval.
+•	Concept: Before querying the Vector DB (FAISS), the system uses an intent classifier to determine if a search is necessary.
+•	Optimization: For "Chit-chat" or requests like "Can you summarize our chat?", the system bypasses the vector search to reduce latency and API costs.
+•	Interview Insight: This addresses the Cost/Quality Awareness paradigm shift, ensuring FAISS is only queried when it adds factual value.
+
+
+### B. Deep Persona Memory Management
+Standard chatbots are often stateless; this agent owns the conversation state.
+•	Sliding Window Memory: Implements a deque with a maxlen=k to ensure controlled memory growth.
+•	State Ownership: Moves beyond simple "Last-N" turns by linking session IDs to persistent user profiles (DOB, Time, Location) to infer life goals and personality traits.
+•	Hybrid Approach: While the middle of long conversations can be summarized to avoid the "Lost-in-the-Middle" problem, the core system prompt and user profile are "pinned" to maintain the "Guru-shishya" decorum.
+
+### C. "Bharat-First" Multilingual NLU
+Treating Hindi and Indian dialects as core logic layers rather than secondary translations.
+•	Tokenization Nuances: Standard tokenizers have high "Fertility Rates" for Hindi (breaking one word into 6+ tokens), which exhausts context windows and inflates costs.
+•	Indic-First Logic: Designed to handle Code-Switching (Hinglish) and Vibhakti (case endings) where standard English-centric NLP fails.
+•	Grounding in "Truth": To prevent hallucinations in ritual or Sloka interpretations, the system employs Correctness Agents that validate outputs against verified scriptures like the Panchang.
+________________________________________
+
+
+
+## 3. System Design Trade-offs
+Feature	Choice	Justification
+Vector DB	Local FAISS	Chosen over managed services (Pinecone) to eliminate network hop latency for sub-second orchestration.
+Memory	Sliding Window	Prevents the model from "forgetting" the user's core intent while managing token limits without the loss of nuance found in constant summarization.
+RAG vs. Fine-tuning	RAG	Astrology requires factual grounding in fresh planetary transits. RAG provides non-parametric memory that doesn't suffer from "catastrophic forgetting".
+________________________________________
+
+
+## 4. Future Roadmap & Scalability
+•	Hybrid Search: Combining FAISS semantic search with keyword-based BM25 for precise ritual/entity lookup.
+•	Infrastructure Orchestration: Moving from a single-model setup to a routing layer that batches prompts across OpenAI, Claude, and LLaMA based on query complexity.
+•	Symbolic Hybrid AI: Integrating a symbolic rule-based engine for mathematically certain astronomical events (planetary degrees) while using LLMs for unstructured interpretation.
+
