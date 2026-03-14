@@ -25,10 +25,10 @@ def test_loading():
     docs = ingest_all_data(data_dir=data_path)
     
     if not docs:
-        print(f"❌ Error: No documents found in {data_path}")
+        print(f"Error: No documents found in {data_path}")
         return
 
-    print(f"✅ Success: Loaded {len(docs)} chunks.")
+    print(f"Success: Loaded {len(docs)} chunks.")
     print(f"Sample Content: {docs[0].page_content[:50]}...")
 
 if __name__ == "__main__":
