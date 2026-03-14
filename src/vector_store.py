@@ -1,35 +1,49 @@
+import os
+import faiss
 from langchain_community.vectorstores import FAISS
-from langchain_huggingface import HuggingFaceEmbeddings # No API key needed
-import logging
-
-logger = logging.getLogger(__name__)
+from langchain_huggingface import HuggingFaceEmbeddings
 
 class AstroVectorStore:
-    def __init__(self):
+    def __init__(self, model_name="all-MiniLM-L6-v2"):
+        # Load local embedding model
+        self.embeddings = HuggingFaceEmbeddings(model_name=model_name)
         self.vector_db = None
-        # Using a lightweight local model: sentence-transformers/all-MiniLM-L6-v2
-        self.embeddings = HuggingFaceEmbeddings(model_name="all-MiniLM-L6-v2")
 
-    def initialize_vector_db(self, documents):
-        """Builds the FAISS index from the documents loaded by ingestor.py."""
-        if not documents:
-            logger.error("No documents provided to initialize Vector DB.")
-            return
-        self.vector_db = FAISS.from_documents(documents, self.embeddings)
-        logger.info("Local FAISS Vector DB initialized successfully.")
+    def initialize_vector_db(self, documents, index_path="faiss_index"):
+        """
+        Builds or loads the FAISS index.
+        Uses from_texts to avoid ID-related attribute errors.
+        """
+        if os.path.exists(index_path):
+            print(f"--- Loading existing index from {index_path} ---")
+            self.vector_db = FAISS.load_local(
+                index_path, 
+                self.embeddings, 
+                allow_dangerous_deserialization=True
+            )
+        elif documents:
+            print("--- Creating new FAISS index from documents ---")
+            texts = [doc.page_content for doc in documents]
+            metadatas = [doc.metadata for doc in documents]
+            
+            # Using from_texts is the most stable way to handle custom objects
+            self.vector_db = FAISS.from_texts(
+                texts=texts, 
+                embedding=self.embeddings, 
+                metadatas=metadatas
+            )
+            self.vector_db.save_local(index_path)
+            print(f"--- Index saved to {index_path} ---")
+        else:
+            print("No documents available and no local index found.")
 
     def is_retrieval_required(self, query: str) -> bool:
+        """Intent-aware logic: only retrieve for astrology-specific queries."""
         query_lower = query.lower()
-        # Add common planets to the intent keywords
-        keywords = [
-            "zodiac", "planet", "trait", "career", "stress", "future", "affect",
-            "sun", "moon", "mars", "mercury", "jupiter", "venus", "saturn"
-        ]
+        keywords = ["zodiac", "planet", "trait", "career", "future", "affect", "sun", "moon", "mars", "saturn"]
         return any(word in query_lower for word in keywords)
 
-    def get_relevant_context(self, query: str):
-        """Performs semantic search to find top-3 relevant facts[cite: 47, 88]."""
+    def get_relevant_context(self, query: str, k=3):
         if not self.vector_db:
             return []
-        # Return top 3 matches for grounding responses [cite: 102]
-        return self.vector_db.similarity_search(query, k=3)
+        return self.vector_db.similarity_search(query, k=k)
